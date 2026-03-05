@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinPulse AI — Banking & Finance Research Intelligence</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0e17;color:#e2e8f0;font-family:'IBM Plex Sans',sans-serif}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0a0e17}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef}=React;
+
+const C={bg:"#0a0e17",bgCard:"#111827",bgCardHover:"#1a2235",accent:"#3b82f6",accentGlow:"rgba(59,130,246,0.15)",green:"#10b981",red:"#ef4444",amber:"#f59e0b",purple:"#8b5cf6",nlm:"#EA8534",text:"#e2e8f0",muted:"#64748b",dim:"#475569",border:"#1e293b",borderL:"#334155"};
+const F={d:"'DM Sans',sans-serif",b:"'IBM Plex Sans',sans-serif",m:"'JetBrains Mono',monospace"};
+
+const papers=[
+{id:1,title:"Systemic Risk Propagation in Interbank Networks Under Climate Stress",source:"SSRN",authors:"K. Fischer, M. Bruni",date:"2026-03-01",relevance:.96,tags:["systemic risk","climate finance","networks"],summary:"Novel agent-based model simulating climate-driven credit shocks across European interbank networks. Finds non-linear amplification above 2.1°C warming scenarios.",trending:true,url:"https://papers.ssrn.com/example1"},
+{id:2,title:"LLM-Augmented Credit Scoring: Fairness and Interpretability Trade-offs",source:"arXiv",authors:"Y. Chen, R. Patel, S. Okonkwo",date:"2026-02-28",relevance:.93,tags:["credit risk","LLM","fairness"],summary:"Proposes a framework for integrating large language models into credit scoring pipelines while maintaining regulatory compliance under EU AI Act constraints.",trending:true,url:"https://arxiv.org/abs/example2"},
+{id:3,title:"Monetary Policy Transmission via Digital Payment Rails",source:"BIS",authors:"A. Carstens, J. Frost",date:"2026-02-27",relevance:.89,tags:["monetary policy","digital payments","CBDC"],summary:"Empirical analysis of how central bank digital currencies alter the speed and magnitude of interest rate pass-through to retail deposits.",url:"https://www.bis.org/example3"},
+{id:4,title:"Tail Risk Contagion in Decentralized Finance Protocols",source:"JoF",authors:"L. Barbon, A. Ranaldo",date:"2026-02-26",relevance:.87,tags:["DeFi","tail risk","contagion"],summary:"First comprehensive study of liquidation cascades across DeFi lending protocols using on-chain data from 2021-2025.",url:"https://doi.org/example4"},
+{id:5,title:"Regulatory Sandboxes and Innovation: A Natural Experiment",source:"ECB",authors:"D. Vives, P. Bolton",date:"2026-02-25",relevance:.84,tags:["regulation","fintech","innovation"],summary:"Causal identification of fintech innovation effects using staggered adoption of regulatory sandboxes across 14 EU jurisdictions.",url:"https://www.ecb.europa.eu/example5"},
+{id:6,title:"Dynamic Hedge Fund Allocation Under Regime Switching",source:"SSRN",authors:"M. Dahlquist, A. Gomes",date:"2026-02-24",relevance:.81,tags:["hedge funds","portfolio","regime switching"],summary:"Bayesian regime-switching model for optimal allocation across hedge fund styles.",url:"https://papers.ssrn.com/example6"},
+];
+
+const news=[
+{id:1,title:"ECB Signals March Rate Cut Amid Banking Sector Turbulence",source:"Financial Times",time:"2h ago",sentiment:"negative",impact:"high"},
+{id:2,title:"Basel IV Implementation Delayed to 2028 for EU Banks",source:"Reuters",time:"4h ago",sentiment:"positive",impact:"high"},
+{id:3,title:"Deutsche Bank Launches AI-Powered Risk Management Platform",source:"Bloomberg",time:"5h ago",sentiment:"positive",impact:"medium"},
+{id:4,title:"China PBOC Expands Digital Yuan Cross-Border Settlement",source:"SCMP",time:"7h ago",sentiment:"neutral",impact:"medium"},
+{id:5,title:"SEC Proposes New Rules for AI-Driven Trading Algorithms",source:"WSJ",time:"9h ago",sentiment:"negative",impact:"high"},
+{id:6,title:"UK Pension Funds Increase Allocation to Private Credit",source:"The Economist",time:"11h ago",sentiment:"neutral",impact:"low"},
+];
+
+const trends=[
+{topic:"Climate Stress Testing",papers:47,change:34,momentum:"surging"},
+{topic:"AI Regulation (EU AI Act)",papers:38,change:28,momentum:"surging"},
+{topic:"CBDC Cross-Border",papers:31,change:15,momentum:"rising"},
+{topic:"DeFi Risk Models",papers:26,change:12,momentum:"rising"},
+{topic:"Basel IV Implementation",papers:22,change:5,momentum:"steady"},
+{topic:"Quantum Computing in Finance",papers:14,change:21,momentum:"surging"},
+];
+
+const digest={date:"March 2, 2026",papersIngested:142,newsArticles:87,regulatoryUpdates:6,
+keyInsight:"Significant convergence in literature on climate-financial risk nexus — three major working papers this week from BIS, ECB, and Fed all propose stress testing frameworks. This appears to be coordinated policy groundwork ahead of the June G20 summit.",
+podcastDuration:"12 min"};
+
+const Dot=({color=C.accent,size=8})=><span style={{display:"inline-block",width:size,height:size,borderRadius:"50%",background:color,boxShadow:`0 0 ${size}px ${color}`,flexShrink:0}}/>;
+const Badge=({children,color=C.accent})=><span style={{fontSize:11,fontFamily:F.m,color,background:`${color}15`,border:`1px solid ${color}30`,borderRadius:4,padding:"2px 8px",letterSpacing:.5,textTransform:"uppercase",whiteSpace:"nowrap"}}>{children}</span>;
+const SentDot=({s})=><Dot color={s==="positive"?C.green:s==="negative"?C.red:C.dim} size={7}/>;
+
+const RelBar=({score})=><div style={{display:"flex",alignItems:"center",gap:8}}>
+<div style={{width:60,height:4,borderRadius:2,background:C.border,overflow:"hidden"}}>
+<div style={{width:`${score*100}%`,height:"100%",borderRadius:2,background:score>.9?C.accent:score>.8?C.purple:C.dim}}/></div>
+<span style={{fontFamily:F.m,fontSize:12,color:C.muted}}>{(score*100).toFixed(0)}%</span></div>;
+
+const MBadge=({m})=>{const cfg={surging:{c:C.green,i:"▲▲"},rising:{c:C.accent,i:"▲"},steady:{c:C.amber,i:"—"}};const x=cfg[m]||cfg.steady;return<Badge color={x.c}>{x.i} {m}</Badge>};
+
+const Card=({children,style={},onClick})=>{const[hov,setHov]=useState(false);return<div onClick={onClick} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} style={{background:hov?C.bgCardHover:C.bgCard,border:`1px solid ${hov?C.borderL:C.border}`,borderRadius:12,padding:20,transition:"all 0.2s",cursor:onClick?"pointer":"default",...style}}>{children}</div>};
+
+const SH=({icon,title,sub})=><div style={{marginBottom:16}}><div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}><span style={{fontSize:16}}>{icon}</span><h2 style={{fontFamily:F.d,fontSize:16,fontWeight:700,color:C.text,margin:0}}>{title}</h2></div>{sub&&<p style={{fontFamily:F.b,fontSize:12,color:C.dim,margin:0,paddingLeft:24}}>{sub}</p>}</div>;
+
+const NLMBtn=({url,compact})=>{const[tip,setTip]=useState(false);const click=(e)=>{e.stopPropagation();window.open("https://notebooklm.google.com/","_blank");setTip(true);setTimeout(()=>setTip(false),3000)};
+if(compact)return<div style={{position:"relative",display:"inline-flex"}}><button onClick={click} title="Open in NotebookLM" style={{display:"flex",alignItems:"center",gap:4,padding:"3px 8px",borderRadius:6,background:`${C.nlm}15`,border:`1px solid ${C.nlm}40`,color:C.nlm,fontFamily:F.m,fontSize:10,cursor:"pointer",transition:"all 0.2s",whiteSpace:"nowrap"}}>▶ NLM</button>{tip&&<div style={{position:"absolute",bottom:"calc(100% + 6px)",left:"50%",transform:"translateX(-50%)",background:C.bgCard,border:`1px solid ${C.nlm}`,borderRadius:8,padding:"8px 12px",zIndex:100,width:200,boxShadow:"0 4px 20px rgba(0,0,0,0.5)"}}><p style={{fontFamily:F.b,fontSize:11,color:C.text,margin:"0 0 4px 0"}}>NotebookLM opened! Paste:</p><code style={{fontFamily:F.m,fontSize:10,color:C.nlm,wordBreak:"break-all"}}>{url}</code></div>}</div>;
+return<div style={{position:"relative",display:"inline-flex"}}><button onClick={click} style={{display:"flex",alignItems:"center",gap:6,padding:"6px 14px",borderRadius:8,background:`${C.nlm}15`,border:`1px solid ${C.nlm}40`,color:C.nlm,fontFamily:F.d,fontSize:12,fontWeight:600,cursor:"pointer",transition:"all 0.2s"}}>▶ Open in NotebookLM</button>{tip&&<div style={{position:"absolute",bottom:"calc(100% + 8px)",left:"50%",transform:"translateX(-50%)",background:C.bgCard,border:`1px solid ${C.nlm}`,borderRadius:10,padding:"10px 14px",zIndex:100,width:240,boxShadow:"0 4px 24px rgba(0,0,0,0.5)"}}><p style={{fontFamily:F.b,fontSize:12,color:C.text,margin:"0 0 6px 0",fontWeight:600}}>NotebookLM opened!</p><p style={{fontFamily:F.b,fontSize:11,color:C.muted,margin:"0 0 6px 0"}}>Paste this paper URL:</p><code style={{fontFamily:F.m,fontSize:10,color:C.nlm,wordBreak:"break-all",display:"block",background:`${C.nlm}10`,padding:"6px 8px",borderRadius:4}}>{url}</code></div>}</div>};
+
+const TABS=[{id:"dashboard",label:"Dashboard",icon:"◉"},{id:"papers",label:"Papers",icon:"◎"},{id:"news",label:"News",icon:"⊕"},{id:"trends",label:"Trends",icon:"△"},{id:"chat",label:"Ask FinPulse",icon:"⬡"},{id:"podcast",label:"Podcast",icon:"▶"}];
+
+const DashView=({setTab})=><div style={{display:"flex",flexDirection:"column",gap:20}}>
+<div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
+{[{l:"Papers Today",v:digest.papersIngested,i:"📄",c:C.accent},{l:"News Articles",v:digest.newsArticles,i:"📰",c:C.green},{l:"Regulatory Updates",v:digest.regulatoryUpdates,i:"⚖️",c:C.amber},{l:"Podcast Ready",v:digest.podcastDuration,i:"🎙️",c:C.purple}].map((s,i)=>
+<Card key={i} style={{textAlign:"center",padding:16}}><div style={{fontSize:24,marginBottom:8}}>{s.i}</div><div style={{fontFamily:F.m,fontSize:28,fontWeight:700,color:s.c}}>{s.v}</div><div style={{fontFamily:F.b,fontSize:12,color:C.muted,marginTop:4}}>{s.l}</div></Card>)}
+</div>
+<Card style={{borderLeft:`3px solid ${C.accent}`,background:`linear-gradient(135deg,${C.bgCard} 0%,${C.accentGlow} 100%)`}}>
+<div style={{display:"flex",alignItems:"flex-start",gap:12}}><span style={{fontSize:20}}>💡</span><div><h3 style={{fontFamily:F.d,fontSize:14,fontWeight:700,color:C.accent,margin:"0 0 8px 0"}}>KEY INSIGHT — {digest.date}</h3><p style={{fontFamily:F.b,fontSize:14,color:C.text,margin:0,lineHeight:1.6}}>{digest.keyInsight}</p></div></div></Card>
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+<div><SH icon="🔬" title="Top Papers Today" sub="Ranked by relevance — click NLM to generate podcast"/>
+{papers.slice(0,3).map(p=><Card key={p.id} style={{marginBottom:8,padding:14}}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8,marginBottom:6,cursor:"pointer"}} onClick={()=>setTab("papers")}><h4 style={{fontFamily:F.d,fontSize:13,color:C.text,margin:0,lineHeight:1.4,flex:1}}>{p.title}</h4>{p.trending&&<Badge color={C.green}>HOT</Badge>}</div>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><span style={{fontFamily:F.b,fontSize:11,color:C.dim}}>{p.source} · {p.authors.split(",")[0]} et al.</span><div style={{display:"flex",alignItems:"center",gap:8}}><NLMBtn url={p.url} compact/><RelBar score={p.relevance}/></div></div></Card>)}</div>
+<div><SH icon="📡" title="Breaking Financial News" sub="Sentiment-scored and impact-rated"/>
+{news.slice(0,4).map(n=><Card key={n.id} style={{marginBottom:8,padding:14}} onClick={()=>setTab("news")}>
+<div style={{display:"flex",alignItems:"flex-start",gap:10}}><SentDot s={n.sentiment}/><div style={{flex:1}}><h4 style={{fontFamily:F.d,fontSize:13,color:C.text,margin:"0 0 4px 0",lineHeight:1.4}}>{n.title}</h4><div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><span style={{fontFamily:F.b,fontSize:11,color:C.dim}}>{n.source} · {n.time}</span><Badge color={n.impact==="high"?C.red:n.impact==="medium"?C.amber:C.dim}>{n.impact}</Badge></div></div></div></Card>)}</div>
+</div>
+<div><SH icon="📈" title="Trending Research Topics" sub="Momentum based on 30-day publication velocity"/>
+<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
+{trends.map((t,i)=><Card key={i} style={{padding:14,cursor:"pointer"}} onClick={()=>setTab("trends")}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><span style={{fontFamily:F.d,fontSize:13,fontWeight:600,color:C.text}}>{t.topic}</span><MBadge m={t.momentum}/></div>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><span style={{fontFamily:F.m,fontSize:12,color:C.muted}}>{t.papers} papers</span><span style={{fontFamily:F.m,fontSize:12,color:C.green}}>+{t.change}% ↑</span></div></Card>)}</div></div>
+</div>;
+
+const PapersView=()=>{const[exp,setExp]=useState(null);return<div><SH icon="📄" title="Research Papers" sub="Click to expand — use NLM button to generate podcast"/>
+{papers.map(p=><Card key={p.id} style={{marginBottom:10,padding:16}} onClick={()=>setExp(exp===p.id?null:p.id)}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12}}>
+<div style={{flex:1}}><div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>{p.trending&&<Dot color={C.green} size={6}/>}<h3 style={{fontFamily:F.d,fontSize:15,fontWeight:600,color:C.text,margin:0,lineHeight:1.4}}>{p.title}</h3></div>
+<div style={{display:"flex",alignItems:"center",gap:12,marginBottom:8}}><Badge color={C.purple}>{p.source}</Badge><span style={{fontFamily:F.b,fontSize:12,color:C.dim}}>{p.authors}</span><span style={{fontFamily:F.m,fontSize:11,color:C.dim}}>{p.date}</span></div>
+<div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{p.tags.map(t=><Badge key={t} color={C.muted}>{t}</Badge>)}</div></div>
+<div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}><RelBar score={p.relevance}/><NLMBtn url={p.url} compact/></div></div>
+{exp===p.id&&<div style={{marginTop:14,paddingTop:14,borderTop:`1px solid ${C.border}`}}>
+<p style={{fontFamily:F.b,fontSize:13,color:C.muted,lineHeight:1.7,margin:"0 0 12px 0"}}>{p.summary}</p>
+<div style={{display:"flex",alignItems:"center",gap:12}}><NLMBtn url={p.url}/></div></div>}
+</Card>)}</div>};
+
+const NewsView=()=><div><SH icon="📰" title="Financial News Feed" sub="Real-time news with AI sentiment and impact scoring"/>
+{news.map(n=><Card key={n.id} style={{marginBottom:10,padding:16}}>
+<div style={{display:"flex",alignItems:"flex-start",gap:14}}>
+<div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,paddingTop:2}}><SentDot s={n.sentiment}/><span style={{fontFamily:F.m,fontSize:9,color:C.dim,textTransform:"uppercase"}}>{n.sentiment}</span></div>
+<div style={{flex:1}}><h3 style={{fontFamily:F.d,fontSize:15,fontWeight:600,color:C.text,margin:"0 0 6px 0"}}>{n.title}</h3>
+<div style={{display:"flex",alignItems:"center",gap:12}}><span style={{fontFamily:F.b,fontSize:12,color:C.dim}}>{n.source}</span><span style={{fontFamily:F.m,fontSize:11,color:C.dim}}>{n.time}</span><Badge color={n.impact==="high"?C.red:n.impact==="medium"?C.amber:C.dim}>{n.impact} impact</Badge></div></div></div></Card>)}</div>;
+
+const TrendsView=()=><div><SH icon="📈" title="Research Trend Radar" sub="Emerging topics by publication velocity"/>
+{trends.map((t,i)=><Card key={i} style={{marginBottom:10,padding:18}}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+<div style={{display:"flex",alignItems:"center",gap:12}}><span style={{fontFamily:F.d,fontSize:17,fontWeight:700,color:C.text}}>{t.topic}</span><MBadge m={t.momentum}/></div>
+<span style={{fontFamily:F.m,fontSize:22,fontWeight:700,color:C.green}}>+{t.change}%</span></div>
+<div style={{display:"flex",alignItems:"center",gap:12}}>
+<div style={{flex:1,height:6,borderRadius:3,background:C.border,overflow:"hidden"}}><div style={{width:`${Math.min(t.papers*2,100)}%`,height:"100%",borderRadius:3,background:t.momentum==="surging"?`linear-gradient(90deg,${C.green},${C.accent})`:t.momentum==="rising"?C.accent:C.dim}}/></div>
+<span style={{fontFamily:F.m,fontSize:13,color:C.muted,whiteSpace:"nowrap"}}>{t.papers} papers (30d)</span></div></Card>)}</div>;
+
+const ChatView=()=>{const[msgs,setMsgs]=useState([{role:"assistant",content:"Welcome to FinPulse AI. I have access to 142 papers, 87 news articles, and 6 regulatory updates ingested today. What would you like to explore?"}]);
+const[input,setInput]=useState("");const[loading,setLoading]=useState(false);const ref=useRef(null);
+useEffect(()=>{ref.current?.scrollIntoView({behavior:"smooth"})},[msgs]);
+const examples=["What are the latest papers on climate stress testing?","Summarize today's key regulatory developments","How has DeFi risk modeling evolved?","Any new papers on CBDC monetary policy?"];
+const send=(text)=>{const q=text||input;if(!q.trim())return;setMsgs(p=>[...p,{role:"user",content:q}]);setInput("");setLoading(true);
+setTimeout(()=>{let r="";
+if(q.toLowerCase().includes("climate")||q.toLowerCase().includes("stress"))r="Climate stress testing is surging (+34% velocity). Standout paper: **Fischer & Bruni (2026)** on SSRN — agent-based model for climate credit shocks in interbank networks, finding non-linear amplification above 2.1°C. Three central banks released aligned frameworks this week ahead of the G20 summit.";
+else if(q.toLowerCase().includes("regulatory")||q.toLowerCase().includes("regulation"))r="Key updates today: **Basel IV delayed to 2028** for EU banks (Reuters). **SEC proposed new rules** for AI trading algorithms (WSJ). On the academic side, Vives & Bolton's ECB Working Paper studies regulatory sandbox effects across 14 EU jurisdictions.";
+else if(q.toLowerCase().includes("defi"))r="DeFi risk modeling trending (+12%). Key paper: **Barbon & Ranaldo (2026)** in Journal of Finance — first comprehensive peer-reviewed study of DeFi liquidation cascades using 2021-2025 on-chain data.";
+else r=`Searched 142 papers and 87 articles for "${q}". Most relevant: Chen et al. (2026) on LLM-augmented credit scoring under EU AI Act, and Deutsche Bank's new AI risk platform (Bloomberg). Want me to go deeper?`;
+setMsgs(p=>[...p,{role:"assistant",content:r}]);setLoading(false)},1200)};
+return<div style={{display:"flex",flexDirection:"column",height:"calc(100vh - 140px)"}}><SH icon="⬡" title="Ask FinPulse" sub="Chat with your research knowledge base"/>
+<div style={{flex:1,overflowY:"auto",paddingRight:8,marginBottom:12}}>
+{msgs.map((m,i)=><div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start",marginBottom:12}}>
+<div style={{maxWidth:"80%",padding:"12px 16px",borderRadius:12,background:m.role==="user"?C.accent:C.bgCard,border:m.role==="user"?"none":`1px solid ${C.border}`,color:C.text,fontFamily:F.b,fontSize:13,lineHeight:1.7,whiteSpace:"pre-wrap"}}>
+{m.content.split("**").map((part,j)=>j%2===1?<strong key={j} style={{color:m.role==="user"?"#fff":C.accent}}>{part}</strong>:<span key={j}>{part}</span>)}</div></div>)}
+{loading&&<div style={{display:"flex",justifyContent:"flex-start",marginBottom:12}}><div style={{padding:"12px 16px",borderRadius:12,background:C.bgCard,border:`1px solid ${C.border}`}}><span style={{fontFamily:F.m,fontSize:13,color:C.dim,animation:"pulse 1.5s infinite"}}>● ● ●</span></div></div>}
+<div ref={ref}/></div>
+{msgs.length<=1&&<div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:12}}>{examples.map((q,i)=><button key={i} onClick={()=>send(q)} style={{fontFamily:F.b,fontSize:12,color:C.muted,background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:20,padding:"6px 14px",cursor:"pointer"}}>{q}</button>)}</div>}
+<div style={{display:"flex",gap:10}}><input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Ask about papers, trends, news..." style={{flex:1,fontFamily:F.b,fontSize:14,color:C.text,background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:10,padding:"12px 16px",outline:"none"}}/>
+<button onClick={()=>send()} style={{fontFamily:F.d,fontSize:14,fontWeight:600,color:"#fff",background:C.accent,border:"none",borderRadius:10,padding:"12px 24px",cursor:"pointer"}}>Send</button></div></div>};
+
+const PodcastView=()=>{const[playing,setPlaying]=useState(false);const[prog,setProg]=useState(0);
+useEffect(()=>{if(!playing)return;const iv=setInterval(()=>setProg(p=>p>=100?(setPlaying(false),0):p+.3),100);return()=>clearInterval(iv)},[playing]);
+const transcript=[{t:"0:00",s:"Good morning. Today's FinPulse briefing covers 142 new papers and 87 news articles."},{t:"0:45",s:"Climate stress testing is surging (+34%). Fischer and Bruni's SSRN paper proposes an agent-based model showing non-linear credit shock amplification above 2.1°C."},{t:"2:30",s:"Basel IV delayed to 2028 for EU banks. SEC proposing new rules for AI-driven trading algorithms."},{t:"4:15",s:"Chen, Patel, and Okonkwo address LLM integration in credit scoring under EU AI Act requirements."},{t:"6:00",s:"Barbon and Ranaldo provide the first peer-reviewed study of DeFi liquidation cascades."},{t:"8:30",s:"Quantum computing in finance surged 21% this month — fastest-growing niche topic."},{t:"10:30",s:"Key insight: BIS, ECB, and Fed all released aligned climate stress testing frameworks — likely coordinated ahead of June G20."}];
+return<div><SH icon="🎙️" title="Daily Research Podcast" sub={`${digest.date} — ${digest.podcastDuration} briefing`}/>
+<Card style={{marginBottom:20,borderLeft:`3px solid ${C.purple}`}}>
+<div style={{display:"flex",alignItems:"center",gap:16,marginBottom:14}}>
+<button onClick={()=>setPlaying(!playing)} style={{width:52,height:52,borderRadius:"50%",border:"none",background:`linear-gradient(135deg,${C.purple},${C.accent})`,color:"#fff",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 0 20px ${C.purple}40`}}>{playing?"⏸":"▶"}</button>
+<div style={{flex:1}}><h3 style={{fontFamily:F.d,fontSize:16,fontWeight:700,color:C.text,margin:"0 0 4px 0"}}>FinPulse Daily Briefing</h3><p style={{fontFamily:F.b,fontSize:12,color:C.muted,margin:0}}>{digest.date} · {digest.papersIngested} papers · {digest.newsArticles} articles</p></div>
+<span style={{fontFamily:F.m,fontSize:13,color:C.dim}}>{digest.podcastDuration}</span></div>
+<div style={{width:"100%",height:4,borderRadius:2,background:C.border,overflow:"hidden"}}><div style={{width:`${prog}%`,height:"100%",borderRadius:2,background:`linear-gradient(90deg,${C.purple},${C.accent})`,transition:"width 0.1s linear"}}/></div></Card>
+<SH icon="📝" title="Transcript" sub="AI-generated summary"/>
+{transcript.map((t,i)=><Card key={i} style={{marginBottom:8,padding:14}}><div style={{display:"flex",gap:14}}><span style={{fontFamily:F.m,fontSize:12,color:C.purple,whiteSpace:"nowrap",paddingTop:2}}>{t.t}</span><p style={{fontFamily:F.b,fontSize:13,color:C.text,lineHeight:1.7,margin:0}}>{t.s}</p></div></Card>)}</div>};
+
+const App=()=>{const[tab,setTab]=useState("dashboard");
+const content=()=>{switch(tab){case"dashboard":return<DashView setTab={setTab}/>;case"papers":return<PapersView/>;case"news":return<NewsView/>;case"trends":return<TrendsView/>;case"chat":return<ChatView/>;case"podcast":return<PodcastView/>;default:return<DashView setTab={setTab}/>}};
+return<div style={{background:C.bg,minHeight:"100vh",fontFamily:F.b,color:C.text}}>
+<div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 28px",borderBottom:`1px solid ${C.border}`,background:`linear-gradient(180deg,${C.bgCard} 0%,${C.bg} 100%)`}}>
+<div style={{display:"flex",alignItems:"center",gap:12}}>
+<div style={{width:32,height:32,borderRadius:8,background:`linear-gradient(135deg,${C.accent},${C.purple})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:700,color:"#fff",fontFamily:F.d,boxShadow:`0 0 16px ${C.accent}40`}}>F</div>
+<div><h1 style={{fontFamily:F.d,fontSize:18,fontWeight:700,color:C.text,lineHeight:1}}>FinPulse AI</h1><p style={{fontFamily:F.m,fontSize:10,color:C.dim,marginTop:2}}>Banking & Finance Research Intelligence</p></div></div>
+<div style={{display:"flex",alignItems:"center",gap:8}}><Dot color={C.green} size={7}/><span style={{fontFamily:F.m,fontSize:11,color:C.green}}>LIVE</span><span style={{fontFamily:F.m,fontSize:11,color:C.dim,marginLeft:8}}>{digest.date}</span></div></div>
+<div style={{display:"flex",gap:2,padding:"8px 28px",borderBottom:`1px solid ${C.border}`,background:C.bg}}>
+{TABS.map(t=><button key={t.id} onClick={()=>setTab(t.id)} style={{fontFamily:F.d,fontSize:13,fontWeight:tab===t.id?600:400,color:tab===t.id?C.accent:C.dim,background:tab===t.id?C.accentGlow:"transparent",border:`1px solid ${tab===t.id?C.accent+"40":"transparent"}`,borderRadius:8,padding:"8px 16px",cursor:"pointer",transition:"all 0.2s",display:"flex",alignItems:"center",gap:6}}><span style={{fontSize:12}}>{t.icon}</span> {t.label}</button>)}</div>
+<div style={{padding:"20px 28px",maxWidth:1100,margin:"0 auto"}}>{content()}</div></div>};
+
+ReactDOM.render(<App/>,document.getElementById("root"));
+</script>
+</body>
+</html>
