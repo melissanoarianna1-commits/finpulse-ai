@@ -1,0 +1,38 @@
+# Core
+torch>=2.0
+transformers>=4.35
+sentence-transformers>=2.2
+scikit-learn>=1.3
+pandas>=2.0
+numpy>=1.24
+
+# Data validation
+great-expectations>=0.18
+
+# NLP
+spacy>=3.7
+
+# Vector search
+faiss-cpu>=1.7
+
+# API
+fastapi>=0.104
+uvicorn>=0.24
+pydantic>=2.0
+
+# Visualization & notebooks
+jupyter>=1.0
+matplotlib>=3.8
+seaborn>=0.13
+
+# Data ingestion
+requests>=2.31
+feedparser>=6.0
+beautifulsoup4>=4.12
+
+# TTS (podcast)
+openai>=1.0
+
+# Utilities
+python-dotenv>=1.0
+tqdm>=4.66
